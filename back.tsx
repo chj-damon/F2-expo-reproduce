@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { createRef, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Canvas from 'react-native-canvas';
 import F2 from '@antv/f2';
 
 export default function App() {
-  const handleCanvas = (canvas: Canvas) => {
-    if (canvas) {
-      canvas.width = 200;
-      canvas.height = 200;
-      
+  const canvasRef = createRef<Canvas>();
+
+  useEffect(() => {
+    (async () => {
       const data = [
         { name: "芳华", percent: 0.4, a: "1" },
         { name: "妖猫传", percent: 0.2, a: "1" },
@@ -17,8 +16,9 @@ export default function App() {
         { name: "寻梦环游记", percent: 0.05, a: "1" },
         { name: "其他", percent: 0.02, a: "1" }
       ];
+      const context = await canvasRef.current.getContext('2d');
       const chart = new F2.Chart({
-        context: canvas.getContext('2d'),
+        context,
         width: 200,
         height: 200,
         padding: [0, "auto", "auto"]
@@ -30,14 +30,16 @@ export default function App() {
           }
         }
       });
+      // 少了下面这句
       chart.interval().position('name*percent');
       chart.render();
-    }
-  }
+    })();
+  }, [])
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your ap!</Text>
-      <Canvas ref={handleCanvas} />
+      <Text>Open up App.tsx to start working on your app</Text>
+      <Canvas ref={canvasRef} style={{ width: 200, height: 200 }} />
     </View>
   );
 }
